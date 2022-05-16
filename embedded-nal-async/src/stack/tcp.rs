@@ -170,3 +170,45 @@ impl<T: TcpClientStack> TcpClientStack for &mut T {
 		T::close(self, socket)
 	}
 }
+
+/// This trait is implemented by TCP/IP stacks. In contrast to the TcpClientStack trait,
+/// this trait allows creating multiple connections using the same TCP/IP stack.
+///
+/// The trait relies on an associated type, `TcpConnection` which is returned when
+/// creating a TCP connection.
+pub trait TcpClient: embedded_io::Io {
+	/// Type returned when creating a connection.
+	type TcpConnection<'m>: embedded_io::asynch::Read + embedded_io::asynch::Write + Close
+	where
+		Self: 'm;
+
+	/// Options that may be passed to connect.
+	type ConnectOpts<'m>: Default
+	where
+		Self: 'm;
+
+	/// Future returned by `connect` function.
+	type ConnectFuture<'m>: Future<Output = Result<Self::TcpConnection<'m>, Self::Error>> + 'm
+	where
+		Self: 'm;
+
+	/// Connect to the given remote host and port.
+	///
+	/// Returns `Ok` if the connection was successful.
+	fn connect<'m>(
+		&'m mut self,
+		remote: SocketAddr,
+		opts: Self::ConnectOpts<'m>,
+	) -> Self::ConnectFuture<'m>;
+}
+
+/// Closeable resource.
+pub trait Close: embedded_io::Io {
+	/// Future returned by `close`
+	type CloseFuture<'m>: Future<Output = Result<(), Self::Error>> + 'm
+	where
+		Self: 'm;
+
+	/// Close this resource.
+	fn close<'m>(&'m mut self) -> Self::CloseFuture<'m>;
+}
