@@ -182,11 +182,6 @@ pub trait TcpClient: embedded_io::Io {
 	where
 		Self: 'm;
 
-	/// Options that may be passed to connect.
-	type ConnectOpts<'m>: Default
-	where
-		Self: 'm;
-
 	/// Future returned by `connect` function.
 	type ConnectFuture<'m>: Future<Output = Result<Self::TcpConnection<'m>, Self::Error>> + 'm
 	where
@@ -195,11 +190,7 @@ pub trait TcpClient: embedded_io::Io {
 	/// Connect to the given remote host and port.
 	///
 	/// Returns `Ok` if the connection was successful.
-	fn connect<'m>(
-		&'m mut self,
-		remote: SocketAddr,
-		opts: Self::ConnectOpts<'m>,
-	) -> Self::ConnectFuture<'m>;
+	fn connect<'m>(&'m mut self, remote: SocketAddr) -> Self::ConnectFuture<'m>;
 }
 
 /// Closeable resource.
