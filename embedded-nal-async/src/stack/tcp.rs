@@ -178,7 +178,7 @@ impl<T: TcpClientStack> TcpClientStack for &mut T {
 /// creating a TCP connection.
 pub trait TcpClient: embedded_io::Io {
 	/// Type returned when creating a connection.
-	type TcpConnection<'m>: embedded_io::asynch::Read + embedded_io::asynch::Write + Close
+	type TcpConnection<'m>: embedded_io::asynch::Read + embedded_io::asynch::Write
 	where
 		Self: 'm;
 
@@ -191,15 +191,4 @@ pub trait TcpClient: embedded_io::Io {
 	///
 	/// Returns `Ok` if the connection was successful.
 	fn connect<'m>(&'m mut self, remote: SocketAddr) -> Self::ConnectFuture<'m>;
-}
-
-/// Closeable resource.
-pub trait Close: embedded_io::Io {
-	/// Future returned by `close`
-	type CloseFuture<'m>: Future<Output = Result<(), Self::Error>> + 'm
-	where
-		Self: 'm;
-
-	/// Close this resource.
-	fn close<'m>(&'m mut self) -> Self::CloseFuture<'m>;
 }

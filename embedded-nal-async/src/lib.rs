@@ -14,4 +14,4 @@ pub use no_std_net::{IpAddr, Ipv4Addr, Ipv6Addr, SocketAddr, SocketAddrV4, Socke
 
 pub use dns::Dns;
 pub use embedded_nal::AddrType;
-pub use stack::{Close, TcpClient, TcpClientStack, TcpFullStack, UdpClientStack, UdpFullStack};
+pub use stack::{TcpClient, TcpClientStack, TcpFullStack, UdpClientStack, UdpFullStack};
