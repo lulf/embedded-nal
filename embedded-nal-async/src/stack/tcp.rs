@@ -178,7 +178,7 @@ impl<T: TcpClientStack> TcpClientStack for &mut T {
 /// creating a TCP connection.
 pub trait TcpClient: embedded_io::Io {
 	/// Type returned when creating a connection.
-	type TcpConnection<'m>: embedded_io::asynch::Read + embedded_io::asynch::Write
+	type TcpConnection<'m>: embedded_io::asynch::Read<Error = Self::Error> + embedded_io::asynch::Write<Error = Self::Error>
 	where
 		Self: 'm;
 
@@ -191,4 +191,29 @@ pub trait TcpClient: embedded_io::Io {
 	///
 	/// Returns `Ok` if the connection was successful.
 	fn connect<'m>(&'m mut self, remote: SocketAddr) -> Self::ConnectFuture<'m>;
+}
+
+/// This trait is implemented by TCP/IP stacks and models a TCP socket that can be either in connected, or a disconnected state.
+pub trait TcpClientSocket: embedded_io::asynch::Read + embedded_io::asynch::Write {
+	/// Future returned by `connect` function.
+	type ConnectFuture<'m>: Future<Output = Result<(), Self::Error>> + 'm
+	where
+		Self: 'm;
+
+	/// Connect to the given remote host and port.
+	/// If the socket was already connected, it will be disconnected first.
+	/// Returns `Ok` if the connection was successful.
+	fn connect<'m>(&'m mut self, remote: SocketAddr) -> Self::ConnectFuture<'m>;
+
+	/// Future returned by `connect` function.
+	type DisconnectFuture<'m>: Future<Output = Result<(), Self::Error>> + 'm
+	where
+		Self: 'm;
+
+	/// Disconnect the socket.
+	/// Does nothing if the socket was already in a disconnected state.
+	fn disconnect<'m>(&'m mut self) -> Self::DisconnectFuture<'m>;
+
+	/// Returns `true` if this socket is already connected
+	fn is_connected(&self) -> bool;
 }
