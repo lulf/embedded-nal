@@ -176,16 +176,16 @@ impl<T: TcpClientStack> TcpClientStack for &mut T {
 ///
 /// The trait relies on an associated type, `TcpConnection` which is returned when
 /// creating a TCP connection.
-pub trait TcpClient<'t>: embedded_io::Io {
+pub trait TcpClient: embedded_io::Io {
 	/// Type returned when creating a connection.
 	type TcpConnection<'m>: embedded_io::asynch::Read<Error = Self::Error> + embedded_io::asynch::Write<Error = Self::Error>
 	where
-		Self: 't + 'm;
+		Self: 'm;
 
 	/// Future returned by `connect` function.
-	type ConnectFuture<'m>: Future<Output = Result<Self::TcpConnection<'t>, Self::Error>> + 'm
+	type ConnectFuture<'m>: Future<Output = Result<Self::TcpConnection<'m>, Self::Error>> + 'm
 	where
-		Self: 't + 'm;
+		Self: 'm;
 
 	/// Connect to the given remote host and port.
 	///
