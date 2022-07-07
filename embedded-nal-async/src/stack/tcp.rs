@@ -205,14 +205,9 @@ pub trait TcpClientSocket: embedded_io::asynch::Read + embedded_io::asynch::Writ
 	/// Returns `Ok` if the connection was successful.
 	fn connect<'m>(&'m mut self, remote: SocketAddr) -> Self::ConnectFuture<'m>;
 
-	/// Future returned by `connect` function.
-	type DisconnectFuture<'m>: Future<Output = Result<(), Self::Error>> + 'm
-	where
-		Self: 'm;
-
 	/// Disconnect the socket.
 	/// Does nothing if the socket was already in a disconnected state.
-	fn disconnect<'m>(&'m mut self) -> Self::DisconnectFuture<'m>;
+	fn disconnect(&mut self) -> Result<(), Self::Error>;
 
 	/// Returns `true` if this socket is already connected
 	fn is_connected(&self) -> bool;
